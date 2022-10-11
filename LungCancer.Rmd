@@ -1,0 +1,366 @@
+---
+title: "LungCancer"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+(base) lucamannino@d39150v1:~/R_Projects/BulkRNAseq/Data$ Exited GFM loop
+Exited: command not found
+(base) lucamannino@d39150v1:~/R_Projects/BulkRNAseq/Data$ for f in `ls -1 *_1.fastqc.gz | sed 's/_1.fastqc.gz//' `
+> do
+> hisat2 -x index_ReferenceGenome -1 ${f}_1.fastqc.gz -2 ${f}_2.fastqc.gz -S ${f}.bam
+> done
+Warning: Unsupported file format
+24101345 reads; of these:
+  24101345 (100.00%) were paired; of these:
+    710681 (2.95%) aligned concordantly 0 times
+    22601988 (93.78%) aligned concordantly exactly 1 time
+    788676 (3.27%) aligned concordantly >1 times
+    ----
+    710681 pairs aligned concordantly 0 times; of these:
+      155955 (21.94%) aligned discordantly 1 time
+    ----
+    554726 pairs aligned 0 times concordantly or discordantly; of these:
+      1109452 mates make up the pairs; of these:
+        511792 (46.13%) aligned 0 times
+        542064 (48.86%) aligned exactly 1 time
+        55596 (5.01%) aligned >1 times
+98.94% overall alignment rate
+Warning: Unsupported file format
+24120258 reads; of these:
+  24120258 (100.00%) were paired; of these:
+    741223 (3.07%) aligned concordantly 0 times
+    22700322 (94.11%) aligned concordantly exactly 1 time
+    678713 (2.81%) aligned concordantly >1 times
+    ----
+    741223 pairs aligned concordantly 0 times; of these:
+      165786 (22.37%) aligned discordantly 1 time
+    ----
+    575437 pairs aligned 0 times concordantly or discordantly; of these:
+      1150874 mates make up the pairs; of these:
+        528929 (45.96%) aligned 0 times
+        567263 (49.29%) aligned exactly 1 time
+        54682 (4.75%) aligned >1 times
+98.90% overall alignment rate
+Warning: Unsupported file format
+24004924 reads; of these:
+  24004924 (100.00%) were paired; of these:
+    614287 (2.56%) aligned concordantly 0 times
+    22682012 (94.49%) aligned concordantly exactly 1 time
+    708625 (2.95%) aligned concordantly >1 times
+    ----
+    614287 pairs aligned concordantly 0 times; of these:
+      123420 (20.09%) aligned discordantly 1 time
+    ----
+    490867 pairs aligned 0 times concordantly or discordantly; of these:
+      981734 mates make up the pairs; of these:
+        458343 (46.69%) aligned 0 times
+        477778 (48.67%) aligned exactly 1 time
+        45613 (4.65%) aligned >1 times
+99.05% overall alignment rate
+Warning: Unsupported file format
+24079108 reads; of these:
+  24079108 (100.00%) were paired; of these:
+    667689 (2.77%) aligned concordantly 0 times
+    22618360 (93.93%) aligned concordantly exactly 1 time
+    793059 (3.29%) aligned concordantly >1 times
+    ----
+    667689 pairs aligned concordantly 0 times; of these:
+      131072 (19.63%) aligned discordantly 1 time
+    ----
+    536617 pairs aligned 0 times concordantly or discordantly; of these:
+      1073234 mates make up the pairs; of these:
+        510010 (47.52%) aligned 0 times
+        512114 (47.72%) aligned exactly 1 time
+        51110 (4.76%) aligned >1 times
+98.94% overall alignment rate
+Warning: Unsupported file format
+24008980 reads; of these:
+  24008980 (100.00%) were paired; of these:
+    618427 (2.58%) aligned concordantly 0 times
+    22616309 (94.20%) aligned concordantly exactly 1 time
+    774244 (3.22%) aligned concordantly >1 times
+    ----
+    618427 pairs aligned concordantly 0 times; of these:
+      130613 (21.12%) aligned discordantly 1 time
+    ----
+    487814 pairs aligned 0 times concordantly or discordantly; of these:
+      975628 mates make up the pairs; of these:
+        442217 (45.33%) aligned 0 times
+        485477 (49.76%) aligned exactly 1 time
+        47934 (4.91%) aligned >1 times
+99.08% overall alignment rate
+Warning: Unsupported file format
+24148662 reads; of these:
+  24148662 (100.00%) were paired; of these:
+    709429 (2.94%) aligned concordantly 0 times
+    22685604 (93.94%) aligned concordantly exactly 1 time
+    753629 (3.12%) aligned concordantly >1 times
+    ----
+    709429 pairs aligned concordantly 0 times; of these:
+      155360 (21.90%) aligned discordantly 1 time
+    ----
+    554069 pairs aligned 0 times concordantly or discordantly; of these:
+      1108138 mates make up the pairs; of these:
+        507126 (45.76%) aligned 0 times
+        549381 (49.58%) aligned exactly 1 time
+        51631 (4.66%) aligned >1 times
+98.95% overall alignment rate
+Warning: Unsupported file format
+24153576 reads; of these:
+  24153576 (100.00%) were paired; of these:
+    682813 (2.83%) aligned concordantly 0 times
+    22602818 (93.58%) aligned concordantly exactly 1 time
+    867945 (3.59%) aligned concordantly >1 times
+    ----
+    682813 pairs aligned concordantly 0 times; of these:
+      123607 (18.10%) aligned discordantly 1 time
+    ----
+    559206 pairs aligned 0 times concordantly or discordantly; of these:
+      1118412 mates make up the pairs; of these:
+        526367 (47.06%) aligned 0 times
+        539107 (48.20%) aligned exactly 1 time
+        52938 (4.73%) aligned >1 times
+98.91% overall alignment rate
+Warning: Unsupported file format
+24137400 reads; of these:
+  24137400 (100.00%) were paired; of these:
+    779951 (3.23%) aligned concordantly 0 times
+    22541424 (93.39%) aligned concordantly exactly 1 time
+    816025 (3.38%) aligned concordantly >1 times
+    ----
+    779951 pairs aligned concordantly 0 times; of these:
+      152855 (19.60%) aligned discordantly 1 time
+    ----
+    627096 pairs aligned 0 times concordantly or discordantly; of these:
+      1254192 mates make up the pairs; of these:
+        598352 (47.71%) aligned 0 times
+        596999 (47.60%) aligned exactly 1 time
+        58841 (4.69%) aligned >1 times
+98.76% overall alignment rate
+Warning: Unsupported file format
+24101551 reads; of these:
+  24101551 (100.00%) were paired; of these:
+    779707 (3.24%) aligned concordantly 0 times
+    22497085 (93.34%) aligned concordantly exactly 1 time
+    824759 (3.42%) aligned concordantly >1 times
+    ----
+    779707 pairs aligned concordantly 0 times; of these:
+      164486 (21.10%) aligned discordantly 1 time
+    ----
+    615221 pairs aligned 0 times concordantly or discordantly; of these:
+      1230442 mates make up the pairs; of these:
+        557994 (45.35%) aligned 0 times
+        612966 (49.82%) aligned exactly 1 time
+        59482 (4.83%) aligned >1 times
+98.84% overall alignment rate
+Warning: Unsupported file format
+24032052 reads; of these:
+  24032052 (100.00%) were paired; of these:
+    622781 (2.59%) aligned concordantly 0 times
+    22694637 (94.43%) aligned concordantly exactly 1 time
+    714634 (2.97%) aligned concordantly >1 times
+    ----
+    622781 pairs aligned concordantly 0 times; of these:
+      119818 (19.24%) aligned discordantly 1 time
+    ----
+    502963 pairs aligned 0 times concordantly or discordantly; of these:
+      1005926 mates make up the pairs; of these:
+        476071 (47.33%) aligned 0 times
+        487632 (48.48%) aligned exactly 1 time
+        42223 (4.20%) aligned >1 times
+99.01% overall alignment rate
+Warning: Unsupported file format
+24083727 reads; of these:
+  24083727 (100.00%) were paired; of these:
+    693046 (2.88%) aligned concordantly 0 times
+    22700477 (94.26%) aligned concordantly exactly 1 time
+    690204 (2.87%) aligned concordantly >1 times
+    ----
+    693046 pairs aligned concordantly 0 times; of these:
+      149017 (21.50%) aligned discordantly 1 time
+    ----
+    544029 pairs aligned 0 times concordantly or discordantly; of these:
+      1088058 mates make up the pairs; of these:
+        500461 (46.00%) aligned 0 times
+        541783 (49.79%) aligned exactly 1 time
+        45814 (4.21%) aligned >1 times
+98.96% overall alignment rate
+Warning: Unsupported file format
+24122351 reads; of these:
+  24122351 (100.00%) were paired; of these:
+    682711 (2.83%) aligned concordantly 0 times
+    22726585 (94.21%) aligned concordantly exactly 1 time
+    713055 (2.96%) aligned concordantly >1 times
+    ----
+    682711 pairs aligned concordantly 0 times; of these:
+      133859 (19.61%) aligned discordantly 1 time
+    ----
+    548852 pairs aligned 0 times concordantly or discordantly; of these:
+      1097704 mates make up the pairs; of these:
+        521731 (47.53%) aligned 0 times
+        532138 (48.48%) aligned exactly 1 time
+        43835 (3.99%) aligned >1 times
+98.92% overall alignment rate
+(base) lucamannino@d39150v1:~/R_Projects/BulkRNAseq/Data$ 
+
+
+
+
+
+
+
+
+
+
+```{r}
+#define shared directory for RNAseq data
+RNAseqDATADIR <- "QCResults/"
+#list the fastq files in the raw data directory
+dir(RNAseqDATADIR)
+
+
+```
+#QC
+
+```{r}
+fastqc(fq.dir = "Data", # FASTQ files directory
+       qc.dir = "QCResults", # Results direcory
+       threads = 40                    # Number of threads
+       )
+```
+
+
+```{r}
+library(fastqcr)
+
+# Aggregating Multiple FastQC Reports into a Data Frame 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# Demo QC directory containing zipped FASTQC reports
+qc.dir <- system.file("fastqc_results", package = "fastqcr")
+qc <- qc_aggregate(RNAseqDATADIR)
+qc
+
+# Inspecting QC Problems
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# See which modules failed in the most samples
+qc_fails(qc, "module")
+# Or, see which samples failed the most
+qc_fails(qc, "sample")
+
+# Building Multi QC Reports
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+qc_report(qc.dir, result.file = "multi-qc-report" )
+
+# Building One-Sample QC Reports (+ Interpretation)
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+qc.file <- system.file("fastqc_results", "S1_fastqc.zip", package = "fastqcr")
+qc_report(qc.file, result.file = "one-sample-report",
+          interpret = TRUE)
+```
+
+```{r}
+list.files(qc.dir)
+```
+
+```{r}
+library(dplyr)
+qc %>%
+  select(sample, module, status) %>%    
+  filter(status %in% c("WARN", "FAIL")) %>%
+  arrange(sample)
+```
+
+```{r}
+summary(qc)
+```
+
+```{r}
+qc_stats(qc)
+```
+
+```{r}
+qc_fails(qc, "module")
+```
+
+
+```{r}
+# See which module warned in the most samples
+qc_warns(qc, "module")
+
+# See which modules failed or warned.
+qc_problems(qc, "module")
+
+qc_problems(qc, "module", compact = FALSE)
+
+qc_problems(qc, "module",  name = "Per sequence GC content")
+
+qc_problems(qc, "module",  name = "GC content")
+```
+
+```{r}
+# See which samples had one or more failed modules
+qc_fails(qc, "sample")
+
+# See which samples had one or more module with failure or warning
+qc_problems(qc, "sample", compact = FALSE)
+
+#qc_problems(qc, "sample", name = "S1")
+```
+
+list.files(system.file("extdata/refs", package="Rhisat2"), pattern="\\.fa$")
+#> [1] "chr1.fa" "chr2.fa" "chr3.fa"
+refs <- list.files(system.file("extdata/refs", package="Rhisat2"), 
+                   full.names=TRUE, pattern="\\.fa$")
+td <- tempdir()
+hisat2_build(references=refs, outdir=td, prefix="myindex", 
+             force=TRUE, strict=TRUE, execute=TRUE)
+```{r}
+
+```
+
+#After creating the index, reads can be aligned using the hisat2 wrapper function. Most commonly, the reads will be provided in fastq files (one file for single-end reads, two files for paired-end reads). The names of these files can be provided directly to the hisat2 function, either as a vector (for single-end reads) or as a list of length 2 (for paired-end reads, each list element corresponds to one mate). You also need to provide the path to the index generated by hisat2_build (the output directory combined with the prefix), and the output file name where the alignments should be written.
+
+
+list.files(system.file("extdata/reads", package="Rhisat2"), 
+           pattern="\\.fastq$")
+#> [1] "reads1.fastq" "reads2.fastq"
+reads <- list.files(system.file("extdata/reads", package="Rhisat2"),
+                    pattern="\\.fastq$", full.names=TRUE)
+hisat2(sequences=as.list(reads), index=file.path(td, "myindex"), 
+       type="paired", outfile=file.path(td, "out.sam"), 
+       force=TRUE, strict=TRUE, execute=TRUE)
+```{r}
+
+list.files(system.file("extdata/reads", package="Rhisat2"), 
+           pattern="\\.fastq$")
+```
+```{r}
+td <- "/home/lucamannino/ReferenceGenome"
+```
+
+```{r}
+reads <- list.files(system.file("extdata/reads", package="Rhisat2"),
+                    pattern="\\.fastq$", full.names=TRUE)
+hisat2(sequences=as.list(reads), index=file.path(td, "myindex"), 
+       type="paired", outfile=file.path(td, "out.sam"), 
+       force=TRUE, strict=TRUE, execute=TRUE)
+```
+
+
+```{r}
+library(Rsubread)
+
+Count_Test <- featureCounts(files="Data/1.bam",isPairedEnd=TRUE,annot.inbuilt = "hg38")
+```
+
+
+
