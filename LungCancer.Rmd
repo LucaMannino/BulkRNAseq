@@ -359,7 +359,19 @@ hisat2(sequences=as.list(reads), index=file.path(td, "myindex"),
 ```{r}
 library(Rsubread)
 
-Count_Test <- featureCounts(files="Data/1.bam",isPairedEnd=TRUE,annot.inbuilt = "hg38")
+Count_1 <- featureCounts(files="Data/1.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_2 <- featureCounts(files="Data/2.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_3 <- featureCounts(files="Data/3.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_4 <- featureCounts(files="Data/4.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_5 <- featureCounts(files="Data/5.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_6 <- featureCounts(files="Data/6.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_7 <- featureCounts(files="Data/7.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_8 <- featureCounts(files="Data/8.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_9 <- featureCounts(files="Data/9.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_10 <- featureCounts(files="Data/10.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_11 <- featureCounts(files="Data/11.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_12 <- featureCounts(files="Data/12.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+
 ```
 
 
