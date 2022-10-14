@@ -375,4 +375,324 @@ Count_12 <- featureCounts(files="Data/12.bam",isPairedEnd=TRUE,annot.ext = "Data
 ```
 
 
+                                 
+                                 
+```{r}
+saveRDS(Count_1,file = "Count_1")
+saveRDS(Count_2,file = "Count_2")
+saveRDS(Count_3,file = "Count_3")
+saveRDS(Count_4,file = "Count_4")
+saveRDS(Count_5,file = "Count_5")
+saveRDS(Count_6,file = "Count_6")
+saveRDS(Count_7,file = "Count_7")
+saveRDS(Count_8,file = "Count_8")
+saveRDS(Count_9,file = "Count_9")
+saveRDS(Count_10,file = "Count_10")
+saveRDS(Count_11,file = "Count_11")
+saveRDS(Count_12,file = "Count_12")
+
+```                                 
+                                 
+                                 
+```{r}
+countdata <- data.frame(Count_1$counts, Count_2$counts, Count_3$counts, Count_4$counts, Count_5$counts, Count_6$counts, Count_7$counts, Count_8$counts, Count_9$counts, Count_10$counts, Count_11$counts, Count_12$counts)
+```
+```{r}
+coldata <- read.csv(file = "Data/coldata.csv", row.names=1, stringsAsFactors=FALSE)
+```
+
+
+
+```{r}
+ddsMat <- DESeqDataSetFromMatrix(countData = countdata,
+                                 colData = coldata,
+                                 design = ~ Cell)
+#dds <- DESeqDataSet(countdata, design = ~ Cell)
+#dds <- DESeq(dds)
+#vst <- assay(vst(dds))
+```
+
+
+
+
+```{r}
+vsd <- vst(ddsMat, blind = FALSE)
+head(assay(vsd), 3)
+```
+```{r}
+rld <- rlog(ddsMat, blind = FALSE)
+head(assay(rld), 3)
+```
+
+  
+```{r}
+library("dplyr")
+library("ggplot2")
+
+dds <- estimateSizeFactors(ddsMat)
+
+df <- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
+         mutate(transformation = "log2(x + 1)"),
+  as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"),
+  as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"))
+  
+colnames(df)[1:2] <- c("x", "y")  
+
+lvls <- c("log2(x + 1)", "vst", "rlog")
+df$transformation <- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  
+```
+
+
+
+
+
+Overall similarity between samples:
+```{r}
+sampleDists <- dist(t(assay(vsd)))
+sampleDists
+```
+
+
+
+```{r}
+library("pheatmap")
+library("RColorBrewer")
+
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <-  vsd@colData@listData[["Cell"]]
+colnames(sampleDistMatrix) <- vsd@colData@listData[["Cell"]]
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)
+```
+
+
+
+```{r}
+library("PoiClaClu")
+poisd <- PoissonDistance(t(counts(dds)))
+
+samplePoisDistMatrix <- as.matrix( poisd$dd )
+rownames(samplePoisDistMatrix) <- dds$Cell
+colnames(samplePoisDistMatrix) <- dds$Cell
+pheatmap(samplePoisDistMatrix,
+         clustering_distance_rows = poisd$dd,
+         clustering_distance_cols = poisd$dd,
+         col = colors)
+```
+
+
+```{r}
+plotPCA(vsd, intgroup = "Cell")
+```
+
+
+Differential expression Analysis:
+
+```{r}
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+res
+```
+will use this objects for GO:
+```{r}
+A549_NCIH460 <- results(dds, contrast = c("Cell", "A549", "NCI-H460"))
+
+A549_Calu1 <-   results(dds, contrast = c("Cell", "A549", "Calu1"))
+
+A549_NCIH358 <-   results(dds, contrast = c("Cell", "A549", "NCI-H358"))
+
+Calu1_NCIH460 <-   results(dds, contrast = c("Cell", "Calu1", "NCI-H460"))
+
+NCIH460_NCIH358 <-   results(dds, contrast = c("Cell", "NCI-H460", "NCI-H358"))
+
+Calu1_NCIH358 <-   results(dds, contrast = c("Cell", "Calu1", "NCI-H358"))
+
+```
+
+
+```{r}
+topGene <- rownames(res)[which.min(res$padj)]
+plotCounts(dds, gene = topGene, intgroup=c("Cell"))
+plotCounts(dds, gene = "PECAM1", intgroup=c("Cell"))
+```
+
+```{r}
+library("ggbeeswarm")
+geneCounts <- plotCounts(dds, gene = topGene, intgroup = "Cell",
+                         returnData = TRUE)
+ggplot(geneCounts, aes(x = Cell, y = count, color = Cell)) +
+  scale_y_log10() +  geom_beeswarm(cex = 3)
+```
+
+
+```{r}
+library("genefilter")
+topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 20)
+
+mat  <- assay(vsd)[ topVarGenes, ]
+mat  <- mat - rowMeans(mat)
+anno <- as.data.frame(colData(vsd)[, "Cell"])
+pheatmap(mat)#, annotation_col = anno )
+```
+
+
+
+
+
+
+
+
+similar as above
+```{r}
+library( "gplots" )
+library( "RColorBrewer" )
+library( "genefilter" )
+topVarGenes <- head( order( rowVars( assay(vsd) ), decreasing=TRUE ), 35 )
+
+heatmap.2( assay(vsd)[ topVarGenes, ], scale="row", 
+     trace="none", dendrogram="column", 
+     col = colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255))#,
+     #ColSideColors = c( Control="gray", DPN="darkgreen", OHT="orange" )[
+       # colData(vsd)$treatment ] )
+```
+
+
+
+
+```{r}
+DE_genes <- as.integer(dds$padj <= 0.05)
+names(DE_genes) <- rownames(d)
+```
+
+
+Gene Ontology:
+
+```{r}
+A549_NCIH460 <- results(dds, contrast = c("Cell", "A549", "NCI-H460"))
+
+A549_Calu1 <-   results(dds, contrast = c("Cell", "A549", "Calu1"))
+
+A549_NCIH358 <-   results(dds, contrast = c("Cell", "A549", "NCI-H358"))
+
+Calu1_NCIH460 <-   results(dds, contrast = c("Cell", "Calu1", "NCI-H460"))
+
+NCIH460_NCIH358 <-   results(dds, contrast = c("Cell", "NCI-H460", "NCI-H358"))
+
+Calu1_NCIH358 <-   results(dds, contrast = c("Cell", "Calu1", "NCI-H358"))
+
+```
+
+```{r}
+all_genes <- row.names(A549_NCIH460)
+DE_genes <- all_genes[which(A549_NCIH460$padj<0.05)]
+head(DE_genes)
+```
+
+
+```{r}
+BiocManager::install("goseq")
+library(goseq)
+```
+
+
+Kegg Pathway
+
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+head(kegg.sets.hs, 3)
+```
+```{r}
+A549_NCIH460$symbol = mapIds(org.Hs.eg.db,
+                     keys=row.names(A549_NCIH460), 
+                     column="SYMBOL",
+                     keytype="SYMBOL",
+                     multiVals="first")
+A549_NCIH460$entrez = mapIds(org.Hs.eg.db,
+                     keys=row.names(A549_NCIH460), 
+                     column="ENTREZID",
+                     keytype="SYMBOL",
+                     multiVals="first")
+A549_NCIH460$name =   mapIds(org.Hs.eg.db,
+                     keys=row.names(A549_NCIH460), 
+                     column="GENENAME",
+                     keytype="SYMBOL",
+                     multiVals="first")
+head(A549_NCIH460, 10)
+```
+
+
+```{r}
+foldchanges = A549_NCIH460$log2FoldChange
+names(foldchanges) = A549_NCIH460$entrez
+head(foldchanges)
+
+```
+
+
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs, same.dir=TRUE)
+# Look at both up (greater), down (less), and statatistics.
+lapply(keggres, head)
+
+```
+
+
+
+```{r}
+keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>% 
+  tbl_df() %>% 
+  filter(row_number()<=5) %>% 
+  .$id %>% 
+  as.character()
+keggrespathways
+## [1] "hsa04142 Lysosome"                    
+## [2] "hsa04640 Hematopoietic cell lineage"  
+## [3] "hsa04630 Jak-STAT signaling pathway"  
+## [4] "hsa00140 Steroid hormone biosynthesis"
+## [5] "hsa04062 Chemokine signaling pathway"
+# Get the IDs.
+keggresids = substr(keggrespathways, start=1, stop=8)
+keggresids
+
+```
+
+```{r}
+# Define plotting function for applying later
+plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa", new.signature=FALSE)
+# plot multiple pathways (plots saved to disk and returns a throwaway list object)
+tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa"))
+```
+
+Gene Ontology
+
+
+
+```{r}
+data(go.sets.hs)
+data(go.subs.hs)
+gobpsets = go.sets.hs[go.subs.hs$BP]
+gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
+lapply(gobpres, head)
+```
+
+
+
+
+
+#save count objects as I'll have to restart R
 
