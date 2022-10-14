@@ -7,3 +7,9 @@ Data/
 *.tar
 *.gz
 *.bam
+Count*
+*.ht2
+*.csv
+*.png
+*.xml
+*.html
