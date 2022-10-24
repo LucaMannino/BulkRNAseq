@@ -392,27 +392,16 @@ saveRDS(Count_11,file = "Count_11")
 saveRDS(Count_12,file = "Count_12")
 
 ```                                 
-
+                                 
 
 ```{r}
 Count_1 <- readRDS(file = "Count_1")
-Count_2 <- readRDS(file = "Count_2")
-Count_3 <- readRDS(file = "Count_3")
-Count_4 <- readRDS(file = "Count_4")
-Count_5 <- readRDS(file = "Count_5")
-Count_6 <- readRDS(file = "Count_6")
-Count_7 <- readRDS(file = "Count_7")
-Count_8 <- readRDS(file = "Count_8")
-Count_9 <- readRDS(file = "Count_9")
-Count_10 <- readRDS(file = "Count_10")
-Count_11 <- readRDS(file = "Count_11")
-Count_12 <- readRDS(file = "Count_12")
+Count_1 <- readRDS(file = "Count_1")
+```                                 
 
 
 
-```
-                                
-                                 
+                              
 ```{r}
 countdata <- data.frame(Count_1$counts, Count_2$counts, Count_3$counts, Count_4$counts, Count_5$counts, Count_6$counts, Count_7$counts, Count_8$counts, Count_9$counts, Count_10$counts, Count_11$counts, Count_12$counts)
 ```
@@ -423,7 +412,6 @@ coldata <- read.csv(file = "Data/coldata.csv", row.names=1, stringsAsFactors=FAL
 
 
 ```{r}
-library(DESeq2)
 ddsMat <- DESeqDataSetFromMatrix(countData = countdata,
                                  colData = coldata,
                                  design = ~ Cell)
@@ -465,23 +453,6 @@ df$transformation <- factor(df$transformation, levels=lvls)
 ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
   coord_fixed() + facet_grid( . ~ transformation)  
 ```
-
-
-```{r}
-ntd <- normTransform(dds)
-library("vsn")
-meanSdPlot(assay(ntd))
-```
-
-```{r}
-meanSdPlot(assay(vsd))
-```
-```{r}
-meanSdPlot(assay(rld))
-
-```
-
-
 
 
 
@@ -540,7 +511,7 @@ dds <- DESeq(dds)
 res <- results(dds)
 res
 ```
-Pairing up each sample individually
+will use this objects for GO:
 ```{r}
 A549_NCIH460 <- results(dds, contrast = c("Cell", "A549", "NCI-H460"))
 
@@ -608,17 +579,14 @@ heatmap.2( assay(vsd)[ topVarGenes, ], scale="row",
 
 ```{r}
 DE_genes <- as.integer(dds$padj <= 0.05)
-#names(DE_genes) <- rownames(dds)
+names(DE_genes) <- rownames(d)
 ```
 
 
 Gene Ontology:
 
 ```{r}
-A549_NCIH460_unshrunken <- results(dds, contrast = c("Cell", "A549", "NCI-H460"))
-
-
-A549_NCIH460 <- lfcShrink(dds, contrast= c("Cell", "A549", "NCI-H460"), res=A549_NCIH460_unshrunken)
+A549_NCIH460 <- results(dds, contrast = c("Cell", "A549", "NCI-H460"))
 
 A549_Calu1 <-   results(dds, contrast = c("Cell", "A549", "Calu1"))
 
@@ -640,7 +608,7 @@ head(DE_genes)
 
 
 ```{r}
-#BiocManager::install("goseq")
+BiocManager::install("goseq")
 library(goseq)
 ```
 
@@ -657,8 +625,6 @@ kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
 head(kegg.sets.hs, 3)
 ```
 ```{r}
-library(org.Hs.eg.db)
-library(AnnotationDbi) 
 A549_NCIH460$symbol = mapIds(org.Hs.eg.db,
                      keys=row.names(A549_NCIH460), 
                      column="SYMBOL",
@@ -674,13 +640,6 @@ A549_NCIH460$name =   mapIds(org.Hs.eg.db,
                      column="GENENAME",
                      keytype="SYMBOL",
                      multiVals="first")
-A549_NCIH460$ENSEMBL =   mapIds(org.Hs.eg.db,
-                     keys=row.names(A549_NCIH460), 
-                     column="ENSEMBL",
-                     keytype="SYMBOL",
-                     multiVals="first")
-
-
 head(A549_NCIH460, 10)
 ```
 
@@ -709,24 +668,24 @@ keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>%
   .$id %>% 
   as.character()
 keggrespathways
-
+## [1] "hsa04142 Lysosome"                    
+## [2] "hsa04640 Hematopoietic cell lineage"  
+## [3] "hsa04630 Jak-STAT signaling pathway"  
+## [4] "hsa00140 Steroid hormone biosynthesis"
+## [5] "hsa04062 Chemokine signaling pathway"
+# Get the IDs.
 keggresids = substr(keggrespathways, start=1, stop=8)
 keggresids
 
 ```
+
+
 
 ```{r}
 # Define plotting function for applying later
 plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa", new.signature=FALSE)
 # plot multiple pathways (plots saved to disk and returns a throwaway list object)
 tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa"))
-```
-
-
-
-
-```{r}
-tmp
 ```
 
 Gene Ontology
@@ -741,50 +700,9 @@ gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
 lapply(gobpres, head)
 ```
 
-```{r}
-genesGO <- A549_NCIH460$padj < 0.05 & !is.na(A549_NCIH460$padj)
-names(genesGO) <- A549_NCIH460$symbol
-```
 
 
-```{r}
-#BiocManager::install("TxDb.Hsapiens.UCSC.hg38.knownGene")
 
-library(goseq)
-pwf <- nullp(genesGO, "hg38","geneSymbol")
-```
 
-```{r}
-goseq_res <- goseq(pwf, "hg38","geneSymbol",test.cats="GO:BP")
-head(goseq_res)
-```
-```{r}
-library(clusterProfiler)
-library(dplyr)
-universe <-  !is.na(A549_NCIH460$symbol)
-A549_NCIH460 <- as.data.frame(A549_NCIH460)
-sigGenes <- dplyr::filter(A549_NCIH460, padj < 0.05, log2FoldChange > 1.5) #& !is.na(A549_NCIH460$symbol)
-
-enrich_go <- enrichGO(
-  gene= sigGenes$symbol,
-  OrgDb = org.Hs.eg.db,
-  keyType = "SYMBOL",
-  ont = "ALL",
-  universe = universe,
-  qvalueCutoff = 0.05,
-  pvalueCutoff = 0.05,
-  readable=TRUE
-)
-
-enrich_go_tidy <- enrich_go %>% 
-  slot("result") %>% 
-  tibble::as_tibble() 
-enrich_go_tidy
-
-dotplot(enrich_go)
-#emapplot(enrich_go)
-x2 <- enrichplot::pairwise_termsim(enrich_go)
-emapplot(x2,cex_label_category = 0.6, group_legend = TRUE)
-```
-
+#save count objects as I'll have to restart R
 
