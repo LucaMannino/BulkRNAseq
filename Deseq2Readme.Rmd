@@ -1,0 +1,368 @@
+---
+title: "Deseq2LungCancer"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Start from loading the count matrices produced in other script
+```{r message = FALSE, warning = FALSE}
+Count_1 <- readRDS(file = "Count_1")
+Count_2 <- readRDS(file = "Count_2")
+Count_3 <- readRDS(file = "Count_3")
+Count_4 <- readRDS(file = "Count_4")
+Count_5 <- readRDS(file = "Count_5")
+Count_6 <- readRDS(file = "Count_6")
+Count_7 <- readRDS(file = "Count_7")
+Count_8 <- readRDS(file = "Count_8")
+Count_9 <- readRDS(file = "Count_9")
+Count_10 <- readRDS(file = "Count_10")
+Count_11 <- readRDS(file = "Count_11")
+Count_12 <- readRDS(file = "Count_12")
+
+
+
+```
+
+```{r message = FALSE, warning = FALSE}
+countdata <- data.frame(Count_1$counts, Count_2$counts, Count_3$counts, Count_4$counts, Count_5$counts, Count_6$counts, Count_7$counts, Count_8$counts, Count_9$counts, Count_10$counts, Count_11$counts, Count_12$counts)
+```
+```{r}
+coldata <- read.csv(file = "Data/coldata.csv", row.names=1, stringsAsFactors=FALSE)
+```
+
+Here deseq2 object is produced
+```{r message = FALSE, warning = FALSE}
+library("dplyr")
+library("ggplot2")
+library("vsn")
+library("DESeq2")
+ddsMat <- DESeqDataSetFromMatrix(countData = countdata,
+                                 colData = coldata,
+                                 design = ~ Cell)
+dds <- DESeq(ddsMat)
+
+```
+
+
+Compare different transformation methods for PCA
+```{r message = FALSE, warning = FALSE}
+
+vsd <- vst(ddsMat, blind = FALSE)
+rld <- rlog(ddsMat, blind = FALSE)
+ntd <- normTransform(ddsMat)
+
+df <- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
+         mutate(transformation = "log2(x + 1)"),
+  as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"),
+  as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"))
+  
+colnames(df)[1:2] <- c("x", "y")  
+
+lvls <- c("log2(x + 1)", "vst", "rlog")
+df$transformation <- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  
+
+```
+
+
+Different PCA plots are produced
+
+```{r message = FALSE, warning = FALSE,  fig.show="hold", out.width="50%"}
+plotPCA(vsd, intgroup = "Cell", ntop = 500)
+plotPCA(rld, intgroup = "Cell", ntop = 500)
+plotPCA(ntd, intgroup = "Cell", ntop = 500)
+```
+
+
+ All of the PCA plots show a clear clustering of our samples. This confirms the samples have good quality
+
+
+ SD against mean is calculated per type of transformation vsd results look better both with this plots and with PCA. vsd will be used to compare group distances in PCA environment
+```{r message = FALSE, warning = FALSE,  fig.show="hold", out.width="50%"} 
+meanSdPlot(assay(ntd))
+meanSdPlot(assay(rld))
+meanSdPlot(assay(vsd))
+
+```
+
+
+ Vsd appear to be the most accurate as we don't expect intra group variations
+
+The following are heatmaps which give information ragarding the general distances between groups
+```{r message = FALSE, warning = FALSE}
+sampleDists <- dist(t(assay(vsd)))
+library("pheatmap")
+library("RColorBrewer")
+
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <-  vsd@colData@listData[["Cell"]]
+colnames(sampleDistMatrix) <- vsd@colData@listData[["Cell"]]
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)
+```
+
+Poisson distances
+```{r message = FALSE, warning = FALSE}
+library("PoiClaClu")
+poisd <- PoissonDistance(t(counts(dds)))
+
+samplePoisDistMatrix <- as.matrix( poisd$dd )
+rownames(samplePoisDistMatrix) <- dds$Cell
+colnames(samplePoisDistMatrix) <- dds$Cell
+pheatmap(samplePoisDistMatrix,
+         clustering_distance_rows = poisd$dd,
+         clustering_distance_cols = poisd$dd,
+         col = colors)
+```
+
+
+
+individual genes can be studied. Example provided 
+```{r message = FALSE, warning = FALSE,  fig.show="hold", out.width="50%"}
+#topGene <- rownames(res)[which.min(res$padj)]
+#plotCounts(dds, gene = topGene, intgroup=c("Cell"))
+plotCounts(dds, gene = "NFE2L2", intgroup=c("Cell"))
+```
+
+Heatmaps of Top Variable genes
+```{r message = FALSE, warning = FALSE,  fig.show="hold", out.width="50%"}
+library("genefilter")
+topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 20)
+
+mat  <- assay(vsd)[ topVarGenes, ]
+mat  <- mat - rowMeans(mat)
+anno <- as.data.frame(colData(vsd)[, "Cell"])
+pheatmap(mat)#, annotation_col = anno )
+library( "gplots" )
+library( "RColorBrewer" )
+library( "genefilter" )
+topVarGenes <- head( order( rowVars( assay(vsd) ), decreasing=TRUE ), 35 )
+
+heatmap.2( assay(vsd)[ topVarGenes, ], scale="row", 
+     trace="none", dendrogram="column", 
+     col = colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255))#,
+     #ColSideColors = c( Control="gray", DPN="darkgreen", OHT="orange" )[
+       # colData(vsd)$treatment ] )
+```
+
+
+
+Count box plot and dispersion plots. Box plot shows there is no outlier among our sampes. Dispersion plot is also typical. "the final estimates shrunk from the gene-wise estimates towards the fitted estimates. Some gene-wise estimates are flagged as outliers and not shrunk towards the fitted value, (this outlier detection is described in the manual page for estimateDispersionsMAP)"
+```{r message = FALSE, warning = FALSE,  fig.show="hold", out.width="50%"}
+par(mar=c(8,5,2,2))
+boxplot(log10(assays(dds)[["cooks"]]), range=0, las=2)
+plotDispEsts(dds)
+
+```
+
+(To be done on results
+Rank of Cook wald statistic . We use Cook’s distance, which is a measure of how much the fitted coefficients would change if an individual sample were removed. This is carried ou as automatic detection of count outliers
+will add later with FDR etc)
+
+Calculation of DEG:plus log2fold change
+
+
+```{r message = FALSE, warning = FALSE}
+dds$Cell <- relevel(dds$Cell, ref = "A549")
+dds <- DESeq(dds)
+NCI.H460vsA549 <- results(dds, contrast = c("Cell", "NCI-H460", "A549"), alpha = 0.05)
+NCI.H460vsA549shrunk <- lfcShrink(dds, coef =4, type = "apeglm")
+
+
+
+Calu1vsA549 <-   results(dds, contrast = c("Cell", "Calu1", "A549"), alpha = 0.05)
+Calu1vsA549shrunk <- lfcShrink(dds, coef =2, type = "apeglm")
+
+
+NCIH358vsA549 <-   results(dds, contrast = c("Cell", "NCI-H358", "A549"), alpha = 0.05)
+NCIH358vsA549shrunk <- lfcShrink(dds, coef =3, type = "apeglm")
+
+
+dds$Cell <- relevel(dds$Cell, ref = "Calu1")
+dds <- DESeq(dds)
+NCIH460vsCalu1 <-   results(dds, contrast = c("Cell", "NCI-H460", "Calu1"), alpha = 0.05)
+NCIH460vsCalu1shrunk <- lfcShrink(dds, coef =3, type = "apeglm")
+
+
+NCIH358vsCalu1 <-   results(dds, contrast = c("Cell", "NCI-H358", "Calu1"), alpha = 0.05)
+NCIH358vsCalu1shrunk <- lfcShrink(dds, coef =4, type = "apeglm")
+
+dds$Cell <- relevel(dds$Cell, ref = "NCI-H358")
+dds <- DESeq(dds)
+NCIH358vsNCIH460 <-   results(dds, contrast = c("Cell", "NCI-H460", "NCI-H358"), alpha = 0.05)
+NCIH358vsNCIH460shrunk <- lfcShrink(dds, coef =4, type = "apeglm")
+
+```
+
+
+
+will use shrinkage for now
+Matrices
+```{r message = FALSE, warning = FALSE}
+DEG_NCI.H460vsA549shrunk <- as.data.frame(NCI.H460vsA549shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange)) %>% write.csv(file = "DEG_NCI.H460vsA549shrunk.csv")
+
+DEG_Calu1vsA549shrunk <- as.data.frame(Calu1vsA549shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange)) %>% write.csv(file = "DEG_Calu1vsA549shrunk.csv")
+
+DEG_NCIH358vsA549shrunk <- as.data.frame(NCIH358vsA549shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange)) %>% write.csv(file = "DEG_NCIH358vsA549shrunk.csv")
+
+DEG_NCIH460vsCalu1shrunk <- as.data.frame(NCIH460vsCalu1shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange))%>% write.csv(file = "DEG_NCIH460vsCalu1shrunk.csv")
+
+DEG_NCIH358vsCalu1shrunk <- as.data.frame(NCIH358vsCalu1shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange)) %>% write.csv(file = "DEG_NCIH358vsCalu1shrunk.csv")
+
+DEG_NCIH358vsNCIH460shrunk <- as.data.frame(NCIH358vsNCIH460shrunk)  %>%  dplyr::filter(padj < 0.05 & log2FoldChange > 0.5)  %>%  dplyr::arrange(desc(log2FoldChange)) %>% write.csv(file = "DEG_NCIH358vsNCIH460shrunk.csv")
+
+
+```
+
+
+
+```{r message = FALSE, warning = FALSE}
+library(EnhancedVolcano)
+vp1 <- EnhancedVolcano(NCI.H460vsA549,
+lab = rownames(NCI.H460vsA549),
+x = 'log2FoldChange',
+y = 'padj', pCutoff = 0.05,
+title = "NCI.H460vsA549")
+print(vp1)
+```
+
+```{r message = FALSE, warning = FALSE}
+library(EnhancedVolcano)
+vp1 <- EnhancedVolcano(NCI.H460vsA549shrunk,
+lab = rownames(NCI.H460vsA549shrunk),
+x = 'log2FoldChange',
+y = 'padj', pCutoff = 0.05,
+title = "NCI.H460vsA549")
+print(vp1)
+```
+
+
+Next will be Kegg 
+
+```{r message = FALSE, warning = FALSE}
+library(pathview)
+library(gage)
+library(gageData)
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+head(kegg.sets.hs, 3)
+```
+```{r  message = FALSE, warning = FALSE}
+library(org.Hs.eg.db)
+library(AnnotationDbi) 
+NCI.H460vsA549shrunk$symbol = mapIds(org.Hs.eg.db,
+                     keys=row.names(NCI.H460vsA549shrunk), 
+                     column="SYMBOL",
+                     keytype="SYMBOL",
+                     multiVals="first")
+NCI.H460vsA549shrunk$entrez = mapIds(org.Hs.eg.db,
+                     keys=row.names(NCI.H460vsA549shrunk), 
+                     column="ENTREZID",
+                     keytype="SYMBOL",
+                     multiVals="first")
+NCI.H460vsA549shrunk$name =   mapIds(org.Hs.eg.db,
+                     keys=row.names(NCI.H460vsA549shrunk), 
+                     column="GENENAME",
+                     keytype="SYMBOL",
+                     multiVals="first")
+NCI.H460vsA549shrunk$ENSEMBL =   mapIds(org.Hs.eg.db,
+                     keys=row.names(NCI.H460vsA549shrunk), 
+                     column="ENSEMBL",
+                     keytype="SYMBOL",
+                     multiVals="first")
+
+
+head(NCI.H460vsA549shrunk, 10)
+```
+
+```{r message = FALSE, warning = FALSE}
+foldchanges = NCI.H460vsA549shrunk$log2FoldChange
+names(foldchanges) = NCI.H460vsA549shrunk$entrez
+head(foldchanges)
+
+```
+
+
+```{r message = FALSE, warning = FALSE}
+keggres = gage(foldchanges, gsets=kegg.sets.hs, same.dir=TRUE)
+# Look at both up (greater), down (less), and statatistics.
+lapply(keggres, head)
+
+```
+
+
+
+```{r message = FALSE, warning = FALSE}
+keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>% 
+  tbl_df() %>% 
+  filter(row_number()<=1000) %>% 
+  .$id %>% 
+  as.character()
+#keggrespathways
+
+keggresids = substr(keggrespathways, start=1, stop=8)
+head(keggresids)
+
+```
+
+```{r message = FALSE, warning = FALSE}
+# Define plotting function for applying later
+plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa", new.signature=FALSE)
+# plot multiple pathways (plots saved to disk and returns a throwaway list object)
+tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa"))
+```
+
+
+
+
+```{r}
+#tmp
+```
+
+```{r message = FALSE, warning = FALSE}
+library(clusterProfiler)
+library(dplyr)
+universe <-  NCI.H460vsA549shrunk$symbol
+NCI.H460vsA549shrunk <- as.data.frame(NCI.H460vsA549shrunk)
+sigGenes <- dplyr::filter(NCI.H460vsA549shrunk, padj < 0.05, log2FoldChange >1) #& !is.na(A549_NCIH460$symbol)
+
+enrich_go <- enrichGO(
+  gene= sigGenes$symbol,
+  OrgDb = org.Hs.eg.db,
+  keyType = "SYMBOL",
+  ont = "ALL",
+  universe = universe,
+  qvalueCutoff = 0.05,
+  pvalueCutoff = 0.05,
+  readable=TRUE
+)
+
+enrich_go_tidy <- enrich_go %>% 
+  slot("result") %>% 
+  tibble::as_tibble() 
+enrich_go_tidy
+pdf(file = "GOEgzample.pdf", width = 6, height = 8)
+dotplot(enrich_go, showCategory=15)
+dev.off()
+#emapplot(enrich_go)
+x2 <- enrichplot::pairwise_termsim(enrich_go)
+emapplot(x2,cex_label_category = 0.6, group_legend = TRUE)
+```
+
+```{r}
+
+```
+
+
+
