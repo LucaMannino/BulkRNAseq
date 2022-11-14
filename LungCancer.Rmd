@@ -340,37 +340,37 @@ hisat2(sequences=as.list(reads), index=file.path(td, "myindex"),
        force=TRUE, strict=TRUE, execute=TRUE)
 ```{r}
 
-list.files(system.file("extdata/reads", package="Rhisat2"), 
-           pattern="\\.fastq$")
+#list.files(system.file("extdata/reads", package="Rhisat2"), 
+ #          pattern="\\.fastq$")
 ```
 ```{r}
-td <- "/home/lucamannino/ReferenceGenome"
+#td <- "/home/lucamannino/Second_Alignment"
 ```
-
+#library("Rhisat2")
 ```{r}
-reads <- list.files(system.file("extdata/reads", package="Rhisat2"),
-                    pattern="\\.fastq$", full.names=TRUE)
-hisat2(sequences=as.list(reads), index=file.path(td, "myindex"), 
-       type="paired", outfile=file.path(td, "out.sam"), 
-       force=TRUE, strict=TRUE, execute=TRUE)
+#reads <- list.files(system.file("extdata/reads", package="Rhisat2"),
+ #                   pattern="\\.fastq$", full.names=TRUE)
+#hisat2(sequences=as.list(reads), index=file.path(td, "myindex"), 
+ #      type="paired", outfile=file.path(td, "out.sam"), 
+#       force=TRUE, strict=TRUE, execute=TRUE)
 ```
-
+Count_3 <- featureCounts(files="Data/3.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
 
 ```{r}
 library(Rsubread)
 
-Count_1 <- featureCounts(files="Data/1.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_2 <- featureCounts(files="Data/2.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_3 <- featureCounts(files="Data/3.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_4 <- featureCounts(files="Data/4.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_5 <- featureCounts(files="Data/5.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_6 <- featureCounts(files="Data/6.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_7 <- featureCounts(files="Data/7.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_8 <- featureCounts(files="Data/8.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_9 <- featureCounts(files="Data/9.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_10 <- featureCounts(files="Data/10.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_11 <- featureCounts(files="Data/11.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
-Count_12 <- featureCounts(files="Data/12.bam",isPairedEnd=TRUE,annot.ext = "Data/data",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_1 <- featureCounts(files="Second_Alignment/1.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_2 <- featureCounts(files="Second_Alignment/2.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_3 <- featureCounts(files="Second_Alignment/3.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_4 <- featureCounts(files="Second_Alignment/4.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_5 <- featureCounts(files="Second_Alignment/5.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_6 <- featureCounts(files="Second_Alignment/6.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_7 <- featureCounts(files="Second_Alignment/7.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_8 <- featureCounts(files="Second_Alignment/8.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_9 <- featureCounts(files="Second_Alignment/9.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_10 <- featureCounts(files="Second_Alignment/10.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_11 <- featureCounts(files="Second_Alignment/11.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
+Count_12 <- featureCounts(files="Second_Alignment/12.bam",isPairedEnd=TRUE,annot.ext = "Second_Alignment/genome.gtf",isGTFAnnotationFile = TRUE,GTF.attrType = "gene_name")
 
 ```
 
@@ -410,7 +410,7 @@ coldata <- read.csv(file = "Data/coldata.csv", row.names=1, stringsAsFactors=FAL
 ```
 
 
-
+library("DESeq2")
 ```{r}
 ddsMat <- DESeqDataSetFromMatrix(countData = countdata,
                                  colData = coldata,
