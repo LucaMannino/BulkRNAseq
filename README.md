@@ -1,3 +1,3 @@
 # BulkRNAseq
 
-BulkRNAseq pipeline including alignement to genome sequence plus deseq2 analysis.
+BulkRNAseq pipeline from alignement to genome sequence to analysis in DESeq2.
